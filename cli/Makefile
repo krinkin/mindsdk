@@ -9,17 +9,20 @@ INSTALL_BIN := ${GOBIN}/mind
 
 .PHONY : install build push upload clean attach
 
-build : ${ARTIFACTS}
+build : init ${ARTIFACTS}
+
+init:
+	go mod init mindsdk/cli
+	go mod tidy
+	go mod vendor
 
 ${ARTIFACTS} : main.go
 	docker build -t ${NAME} .
 	mkdir -p bin
-	go mod init mindsdk/cli
-	go mod vendor
-	go build  -o bin/mind mindsdk/cli 
-	#GOOS=darwin  GOARCH=amd64 go build  -o bin/mind-Darwin-x86_64 mindsdk/cli 
-	#GOOS=linux   GOARCH=amd64 go build  -o bin/mind-Linux-x86_64 mindsdk/cli 
-	#GOOS=windows GOARCH=amd64 go build  -o bin/mind.exe mindsdk/cli
+	go build -o bin/mind mindsdk/cli 
+#	GOOS=darwin  GOARCH=amd64 go build -i -o bin/mind-Darwin-x86_64 mindsdk/cli 
+#	GOOS=linux   GOARCH=amd64 go build -i -o bin/mind-Linux-x86_64 mindsdk/cli 
+#	GOOS=windows GOARCH=amd64 go build -i -o bin/mind.exe mindsdk/cli
 
 ${INSTALL_BIN} : ${ARTIFACTS}
 	cp bin/mind ${GOBIN}/mind
