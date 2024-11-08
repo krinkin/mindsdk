@@ -1,9 +1,9 @@
 NAME := vincross/mindcli
 ARTIFACTS := \
-	bin/mind \
-	bin/mind-Darwin-x86_64 \
-	bin/mind-Linux-x86_64 \
-	bin/mind.exe
+	bin/mind 
+#	bin/mind-Darwin-x86_64 \
+#	bin/mind-Linux-x86_64 \
+#	bin/mind.exe
 
 INSTALL_BIN := ${GOBIN}/mind
 
@@ -15,6 +15,7 @@ ${ARTIFACTS} : main.go
 	docker build -t ${NAME} .
 	mkdir -p bin
 	go mod init mindsdk/cli
+	go mod tidy
 	go mod vendor
 	go build  -o bin/mind mindsdk/cli 
 	#GOOS=darwin  GOARCH=amd64 go build  -o bin/mind-Darwin-x86_64 mindsdk/cli 
@@ -23,6 +24,9 @@ ${ARTIFACTS} : main.go
 
 ${INSTALL_BIN} : ${ARTIFACTS}
 	cp bin/mind ${GOBIN}/mind
+
+clean:
+	rm -rf go.mod go.sum ./vendor ./bin
 
 install : ${INSTALL_BIN}
 
@@ -35,8 +39,6 @@ push :
 upload :
 	scp ${ARTIFACTS} root@vcrxyz.com:/mindcli
 
-clean : 
-	rm -rf bin
 
 attach :
 	docker run -it vincross/mindcli bash
